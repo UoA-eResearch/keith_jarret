@@ -1,2 +1,2 @@
-https://github.com/UoA-eResearch/magenta.git
+git+https://github.com/UoA-eResearch/magenta.git
 apache_beam
