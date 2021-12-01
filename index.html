@@ -1,0 +1,133 @@
+<html>
+
+<head>
+    <script
+        src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.4.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <title>Keith Jarret AI continuations</title>
+    <style>
+        h1 {
+            width: 50%;
+            margin: auto;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.3rem;
+            color: white;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.8);
+            font-family: Arial, Helvetica, sans-serif;
+            text-shadow: 2px 2px #000000;
+            font-weight: normal;
+        }
+
+        midi-player {
+            display: block;
+            width: inherit;
+            margin: 4px;
+            margin-bottom: 0;
+        }
+
+        midi-player::part(control-panel) {
+            background: #ff5;
+            border: 2px solid #000;
+            border-radius: 10px 10px 0 0;
+        }
+
+        midi-player::part(play-button) {
+            color: #353;
+            border: 2px solid currentColor;
+            background-color: #4d4;
+            border-radius: 20px;
+            transition: all 0.2s;
+            content: 'hello';
+        }
+
+        midi-player::part(play-button):hover {
+            color: #0a0;
+            background-color: #5f5;
+            border-radius: 10px;
+        }
+
+        midi-player::part(time) {
+            font-family: monospace;
+        }
+
+        /* Custom visualizer style */
+        midi-visualizer .piano-roll-visualizer {
+            background: #ffd;
+            border: 2px solid black;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            margin: 4px;
+            margin-top: 0;
+            overflow: auto;
+        }
+
+        midi-visualizer svg rect.note {
+            opacity: 0.6;
+            stroke-width: 2;
+        }
+
+        midi-visualizer svg rect.note[data-instrument="0"] {
+            fill: #e22;
+            stroke: #500;
+        }
+
+        midi-visualizer svg rect.note[data-instrument="1"] {
+            fill: #2ee;
+            stroke: #055;
+        }
+
+        midi-visualizer svg rect.note[data-is-drum="true"] {
+            fill: #888;
+            stroke: #888;
+        }
+
+        midi-visualizer svg rect.note.active {
+            opacity: 0.9;
+            stroke: #000;
+        }
+    </style>
+</head>
+
+</html>
+
+<body>
+    <h1>Keith Jarret AI continuations</h1>
+    <div>
+        Keith Jarrett (born May 8, 1945) is an American jazz and classical music pianist and composer. Jarrett has been unable to perform since suffering a stroke in February 2018, and a second stroke in May 2018, which left him partially paralyzed and unable to play with his left hand.
+        Given some examples of Keith's work, an AI might be able to generate music in his style.
+        Some recordings of Keith Jarret were converted into MIDI format using <a href="https://magenta.tensorflow.org/onsets-frames">Onsets and Frames</a>.
+        In <a href="https://colab.research.google.com/drive/17Vp_XJqfGaqaGQCgy8JaL5H9Nn-5Wxr0?usp=sharing">this Google Colab notebook</a>
+        several 60 second primers from these MIDI files were fed into the <a href="https://magenta.tensorflow.org/piano-transformer">Magenta Piano Transformer model</a>.
+        The resulting midi files can be played and visualised below. The cyan parts indicate primer (Keith Jarret), and the red parts indicate AI continuations.
+        It's not perfect, but the technology shows promise.<br>
+        Choose primer: <select id="primer"></select>
+    </div>
+    <midi-player id="player" visualizer=".visualizer"
+        src="https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle_twinkle.mid" sound-font></midi-player>
+    <midi-visualizer type="piano-roll" class="visualizer" id="pianoRollVisualizer"></midi-visualizer>
+    <midi-visualizer type="waterfall" class="visualizer" id="waterfallVisualizer"></midi-visualizer>
+    <midi-visualizer type="staff" class="visualizer" id="staffVisualizer"></midi-visualizer>
+    <script>
+        $.get("mids.txt", function (mids) {
+            mids = mids.split("\n");
+            console.log(mids)
+            for (mid of mids) {
+                $("#primer").append(`<option>${mid}</option>`)
+            }
+            var player = document.getElementById("player");
+            console.log(player)
+            player.src = "midi/" + mids[0]
+            $("#player").on("load", function() {
+                console.log("Loaded")
+                player.start()
+            })
+            $("#primer").change(function() {
+                console.log("Changed to " + this.value)
+                player.src = "midi/" + this.value
+            })
+        })
+    </script>
+</body>
